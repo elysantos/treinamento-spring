@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="br.com.treinamento.treinamento.mapper.EstoqueMapper">
+
+    <resultMap id="estoqueMapper" type="br.com.treinamento.treinamento.model.Estoque">
+        <result column="id" property="id" />
+        <result column="qtd" property="quantidade" />
+
+        <association property="filial" javaType="br.com.treinamento.treinamento.model.Filial">
+            <result column="f_id" property="id"/>
+            <result column="f_nome" property="nome"/>
+        </association>
+
+        <association property="produto" javaType="br.com.treinamento.treinamento.model.Produto">
+            <result column="p_id" property="id"/>
+            <result column="p_descricao" property="descricao"/>
+        </association>
+    </resultMap>
+
+    <select id="recuperarTodos" resultMap="estoqueMapper">
+        SELECT
+        e.id as id,
+        e.qtd as qtd,
+        f.id as f_id,
+        f.nome as f_nome,
+        p.id as  p_id,
+        p.descricao as p_descricao
+        FROM estoque e
+        INNER JOIN filial f on e.id_filial=f.id
+        INNER JOIN produtos p ON p.id=e.id_produto
+    </select>
+
+    <select id="recuperarPorProduto" resultMap="estoqueMapper" parameterType="int">
+        SELECT
+        e.id as id,
+        e.qtd as qtd,
+        f.id as f_id,
+        f.nome as f_nome,
+        p.id as  p_id,
+        p.descricao as p_descricao
+        FROM estoque e
+        INNER JOIN filial f on e.id_filial=f.id
+        INNER JOIN produtos p ON p.id=e.id_produto
+        WHERE e.id_produto=#{produto}
+    </select>
+
+    <select id="recuperarPorFilial" resultMap="estoqueMapper" parameterType="int">
+        SELECT
+        e.id as id,
+        e.qtd as qtd,
+        f.id as f_id,
+        f.nome as f_nome,
+        p.id as  p_id,
+        p.descricao as p_descricao
+        FROM estoque e
+        INNER JOIN filial f on e.id_filial=f.id
+        INNER JOIN produtos p ON p.id=e.id_produto
+        WHERE e.id_filial=#{filial}
+    </select>
+
+    <select id="recuperar" resultMap="estoqueMapper" parameterType="int">
+        SELECT
+        e.id as id,
+        e.qtd as qtd,
+        f.id as f_id,
+        f.nome as f_nome,
+        p.id as  p_id,
+        p.descricao as p_descricao
+        FROM estoque e
+        INNER JOIN filial f on e.id_filial=f.id
+        INNER JOIN produtos p ON p.id=e.id_produto
+        WHERE e.id = #{id}
+    </select>
+
+    <insert id="inserir" parameterType="br.com.treinamento.treinamento.model.Estoque" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO estoque(id_produto, id_filial, quantidade) VALUES
+        ( #{produto.id}, #{filial.id}, #{quantidade})
+    </insert>
+
+    <update id="atualizar" parameterType="br.com.treinamento.treinamento.model.Estoque">
+        UPDATE estoque SET quantidade = #{quantidade}
+        WHERE id_produto = #{produto.id} AND id_filial = #{filial.id}
+    </update>
+
+    <delete id="apagar" parameterType="br.com.treinamento.treinamento.model.Estoque">
+        DELETE FROM estoque
+        WHERE id = #{id}
+    </delete>
+
+
+</mapper>

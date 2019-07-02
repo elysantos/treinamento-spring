@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="br.com.treinamento.treinamento.mapper.PedidoMapper">
+
+    <resultMap id="pedidoMapper" type="br.com.treinamento.treinamento.model.Pedido">
+        <result column="id" property="id" />
+        <result column="data" property="data" />
+        <result column="tipo" property="tipo" />
+
+        <association property="filial" javaType="br.com.treinamento.treinamento.model.Filial">
+            <result column="f_id" property="id"/>
+            <result column="f_nome" property="nome"/>
+        </association>
+
+        <collection property="items" javaType="ArrayList" ofType="br.com.treinamento.treinamento.model.ItemPedidoEstoque">
+            <result column="ip_qtd" property="quantidade"/>
+            <association property="produto" javaType="br.com.treinamento.treinamento.model.Produto">
+                <result column="p_id" property="id"/>
+                <result column="p_descricao" property="descricao"/>
+            </association>
+        </collection>
+
+    </resultMap>
+
+
+    <select id="recuperarTodos" resultMap="pedidoMapper">
+        SELECT
+        p.id as id,
+        p.tipo as tipo,
+        p.data as data,
+        f.id as f_id,
+        f.nome as f_nome,
+        i.quantidade as ip_qtd,
+        pr.id as  p_id,
+        pr.descricao as p_descricao
+        FROM pedido p
+        INNER JOIN filial f on p.id_filial=f.id
+        INNER JOIN itempedido i on i.id_pedido=p.id
+        INNER JOIN produtos pr ON pr.id=i.id_produto
+    </select>
+
+    <select id="recuperar" parameterType="int" resultMap="pedidoMapper">
+        SELECT
+        p.id as id,
+        p.tipo as tipo,
+        p.data as data,
+        f.id as f_id,
+        f.nome as f_nome,
+        i.quantidade as ip_qtd,
+        pr.id as  p_id,
+        pr.descricao as p_descricao
+        FROM pedido p
+        INNER JOIN filial f on p.id_filial=f.id
+        INNER JOIN itempedido i on i.id_pedido=p.id
+        INNER JOIN produtos pr ON pr.id=i.id_produto
+        WHERE p.id = #{id}
+    </select>
+    
+    <insert id="inserir" parameterType="br.com.treinamento.treinamento.model.Pedido" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO pedido(tipo, id_filial) VALUES
+        ( #{tipo}, #{filial.id})
+    </insert>
+
+    <insert id="inserirItems" parameterType="br.com.treinamento.treinamento.model.Pedido" >
+        INSERT INTO itempedido (id_pedido, id_produto, quantidade) VALUES
+        <foreach collection="items" item="item" separator=",">
+            (#{id}, #{item.produto.id}, #{item.quantidade})
+        </foreach>
+    </insert>
+
+    <delete id="apagar" parameterType="br.com.treinamento.treinamento.model.Pedido">
+        DELETE FROM pedido
+        WHERE id = #{id}
+
+        DELETE FROM itempedido WHERE id_pedido=#{id}
+    </delete>
+
+</mapper>

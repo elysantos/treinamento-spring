@@ -1,0 +1,34 @@
+#spring:
+#  profiles:
+#    active: common
+#app:
+#  logging:
+#    host: 192.168.6.182:5000
+
+---
+# Coloque aqui suas configurações de Desenvolvimento
+spring:
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost/treinamento?serverTimezone=UTC
+    username: treinamento
+    password: treinamento
+server:
+  port: 9899
+---
+# Coloque aqui suas configurações de Homologação
+#spring:
+#  profiles:
+#    active: homo
+
+
+---
+#spring:
+#  profiles:
+#    active: deleteMe
+#  datasource:
+#    url: jdbc:h2:mem:testdb
+#    username: sa
+#    password: password
